@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS employee (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    account_id BIGINT NOT NULL UNIQUE,
+    is_deleted SMALLINT NOT NULL DEFAULT 0 CHECK (is_deleted IN (0, 1)),
+    FOREIGN KEY (account_id) REFERENCES account(id) ON DELETE RESTRICT
+);
