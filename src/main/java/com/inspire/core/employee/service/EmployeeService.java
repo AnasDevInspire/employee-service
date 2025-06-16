@@ -13,33 +13,46 @@ import com.inspire.core.employee.repository.EmployeeRepository;
 public class EmployeeService {
 
 	@Autowired
-	private EmployeeRepository repository;
+	private EmployeeRepository employeeRepository;
 
+	////////////////////////////////////////////
 	public Employee createEmployee(Employee employee) {
-		return repository.save(employee);
+		return employeeRepository.save(employee);
 	}
 
+	////////////////////////////////////////////
 	public Optional<Employee> getEmployeeById(Long id) {
-		return repository.findById(id).filter(emp -> emp.getIsDeleted() == 0);
+		return employeeRepository.findById(id);
 	}
 
+	////////////////////////////////////////////
 	public List<Employee> getAllEmployees() {
-		return repository.findAllByIsDeleted(0);
+		return employeeRepository.findAll();
 	}
 
+	////////////////////////////////////////////
 	public Employee updateEmployee(Long id, Employee updated) {
-		return repository.findById(id).map(existing -> {
-			existing.setName(updated.getName());
-			existing.setEmail(updated.getEmail());
-			existing.setAccountId(updated.getAccountId());
-			return repository.save(existing);
-		}).orElseThrow(() -> new RuntimeException("Employee not found"));
+		Optional<Employee> optinalEmployee = employeeRepository.findById(id);
+
+		if (optinalEmployee.isEmpty()) {
+			throw new RuntimeException("Employee not found");
+		}
+
+		Employee employee = optinalEmployee.get();
+
+		employee.setAccountId(updated.getAccountId());
+		employee.setName(updated.getName());
+		employee.setEmail(updated.getEmail());
+		employee.setAccountId(updated.getAccountId());
+
+		return employeeRepository.save(employee);
 	}
 
-	public void softDeleteEmployee(Long id) {
-		repository.findById(id).ifPresent(emp -> {
+	////////////////////////////////////////////
+	public void deleteEmployee(Long id) {
+		employeeRepository.findById(id).ifPresent(emp -> {
 			emp.setIsDeleted(1);
-			repository.save(emp);
+			employeeRepository.save(emp);
 		});
 	}
 }
